@@ -1,267 +1,243 @@
-// Data will be loaded from the Excel file
-let businesses = [];
-let filteredBusinesses = [];
-let states = [];
-
-// Wait for the document to be fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Set current year in footer
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-    
-    // Add event listeners
-    document.getElementById('search-input').addEventListener('input', filterBusinesses);
-    document.getElementById('state-filter').addEventListener('change', filterBusinesses);
-    document.getElementById('rating-filter').addEventListener('change', filterBusinesses);
-    
-    // Close modal when clicking outside
-    window.addEventListener('click', function(event) {
-        const modal = document.getElementById('business-modal');
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-    
-    // Load the data (in a real scenario, this would be fetched from a server)
-    loadData();
-});
-
-// Load the JSON data that would be converted from your Excel file
-function loadData() {
-    // In a real scenario, you would use fetch to get the data from a JSON file
-    // For GitHub Pages, you would need to convert your Excel to JSON first
-    fetch('dog-boarding-data.json')
-        .then(response => response.json())
-        .then(data => {
-            businesses = data;
-            
-            // Extract unique states
-            const stateSet = new Set();
-            businesses.forEach(business => {
-                if (business.state) {
-                    stateSet.add(business.state);
-                }
-            });
-            states = Array.from(stateSet).sort();
-            
-            // Populate state filter
-            const stateFilter = document.getElementById('state-filter');
-            states.forEach(state => {
-                const option = document.createElement('option');
-                option.value = state;
-                option.textContent = state;
-                stateFilter.appendChild(option);
-            });
-            
-            // Initial display
-            filterBusinesses();
-        })
-        .catch(error => {
-            console.error('Error loading data:', error);
-            document.getElementById('business-grid').innerHTML = '<p>Error loading data. Please try again later.</p>';
-        });
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-// Filter businesses based on search input and filters
-function filterBusinesses() {
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const stateFilter = document.getElementById('state-filter').value;
-    const ratingFilter = document.getElementById('rating-filter').value;
-    
-    filteredBusinesses = businesses.filter(business => {
-        // Search term filter
-        const matchesSearch = !searchTerm || 
-            (business.name && business.name.toLowerCase().includes(searchTerm)) ||
-            (business.city && business.city.toLowerCase().includes(searchTerm)) ||
-            (business.full_address && business.full_address.toLowerCase().includes(searchTerm));
-        
-        // State filter
-        const matchesState = !stateFilter || business.state === stateFilter;
-        
-        // Rating filter
-        const rating = parseFloat(business.rating) || 0;
-        const matchesRating = !ratingFilter || rating >= parseFloat(ratingFilter);
-        
-        return matchesSearch && matchesState && matchesRating;
-    });
-    
-    // Update count display
-    document.getElementById('results-count').textContent = `Showing ${filteredBusinesses.length} of ${businesses.length} businesses`;
-    
-    // Display the filtered businesses
-    displayBusinesses();
+body {
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
 }
 
-// Display the filtered businesses
-function displayBusinesses() {
-    const grid = document.getElementById('business-grid');
-    grid.innerHTML = '';
-    
-    if (filteredBusinesses.length === 0) {
-        grid.innerHTML = '<p>No businesses found matching your criteria. Try adjusting your search.</p>';
-        return;
-    }
-    
-    filteredBusinesses.forEach((business, index) => {
-        const card = document.createElement('div');
-        card.className = 'business-card';
-        card.addEventListener('click', () => openBusinessModal(business));
-        
-        const imageUrl = business.photo || 'https://placehold.co/600x400/orange/white?text=No+Image';
-        
-        card.innerHTML = `
-            <div class="business-image" style="background-image: url('${imageUrl}')"></div>
-            <div class="business-info">
-                <h3 class="business-name">${business.name || 'Unnamed Business'}</h3>
-                <p class="business-location">${business.city || ''}, ${business.state || ''}</p>
-                <div class="stars">${renderStars(business.rating)}</div>
-                <p class="business-address">${business.full_address || 'Address not available'}</p>
-                <button class="view-button">View Details</button>
-            </div>
-        `;
-        
-        grid.appendChild(card);
-    });
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-// Render star ratings
-function renderStars(rating) {
-    if (!rating || isNaN(rating)) {
-        return '☆☆☆☆☆';
-    }
-    
-    const fullStars = Math.floor(rating);
-    const halfStar = rating % 1 >= 0.5;
-    const emptyStars = Math.max(0, 5 - fullStars - (halfStar ? 1 : 0));
-    
-    let stars = '';
-    for (let i = 0; i < fullStars; i++) {
-        stars += '★';
-    }
-    
-    if (halfStar) {
-        stars += '★';
-    }
-    
-    for (let i = 0; i < emptyStars; i++) {
-        stars += '☆';
-    }
-    
-    return stars;
+header {
+    background: linear-gradient(135deg, #ff9d6c, #ff7043);
+    color: white;
+    padding: 1.5rem 0;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-// Open business details modal
-function openBusinessModal(business) {
-    const modal = document.getElementById('business-modal');
-    const modalContent = modal.querySelector('.modal-content');
-    
-    const imageUrl = business.photo || 'https://placehold.co/600x400/orange/white?text=No+Image';
-    const workingHours = parseWorkingHours(business.working_hours);
-    
-    modalContent.innerHTML = `
-        <button class="close-button" onclick="closeModal()">&times;</button>
-        <h2>${business.name || 'Unnamed Business'}</h2>
-        
-        <div class="modal-grid">
-            <div>
-                <div class="modal-image" style="background-image: url('${imageUrl}')"></div>
-                
-                <div class="contact-info">
-                    <h3 class="section-title">Contact Information</h3>
-                    ${business.phone ? `
-                        <div class="contact-item">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <a href="tel:${business.phone}">${business.phone}</a>
-                        </div>
-                    ` : ''}
-                    
-                    ${business.site ? `
-                        <div class="contact-item">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <a href="${business.site}" target="_blank">${business.site}</a>
-                        </div>
-                    ` : ''}
-                    
-                    <div class="contact-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span>${business.full_address || 'Address not available'}</span>
-                    </div>
-                    
-                    ${business.location_link ? `
-                        <div class="contact-item">
-                            <a href="${business.location_link}" target="_blank">View on Google Maps</a>
-                        </div>
-                    ` : ''}
-                </div>
-            </div>
-            
-            <div>
-                <div style="margin-bottom: 20px;">
-                    <h3 class="section-title">Ratings & Reviews</h3>
-                    <div style="font-size: 1.5rem; color: #ffc107; margin-bottom: 10px;">
-                        ${renderStars(business.rating)}
-                        <span style="color: #333; margin-left: 10px;">${business.rating || 'No rating'}</span>
-                    </div>
-                    <p>${business.reviews ? `${business.reviews} reviews` : 'No reviews'}</p>
-                    
-                    <div style="margin-top: 10px;">
-                        ${business.business_status === 'OPERATIONAL' ? 
-                            '<span style="color: green;">●</span> Currently Operational' : 
-                            '<span style="color: red;">●</span> Not Operational'}
-                    </div>
-                </div>
-                
-                <div class="modal-hours">
-                    <h3 class="section-title">Business Hours</h3>
-                    ${formatWorkingHours(workingHours)}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    modal.style.display = 'flex';
+.search-section {
+    background-color: white;
+    padding: 1rem 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-// Close the modal
-function closeModal() {
-    document.getElementById('business-modal').style.display = 'none';
+.search-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
 }
 
-// Parse working hours from JSON string
-function parseWorkingHours(hoursString) {
-    if (!hoursString) return {};
-    
-    try {
-        return JSON.parse(hoursString);
-    } catch (e) {
-        console.error('Error parsing working hours:', e);
-        return {};
+@media (min-width: 768px) {
+    .search-grid {
+        grid-template-columns: 1fr 1fr 1fr;
     }
 }
 
-// Format working hours for display
-function formatWorkingHours(hours) {
-    if (!hours || Object.keys(hours).length === 0) {
-        return '<p>Hours not available</p>';
+input, select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.results-count {
+    margin: 1rem 0;
+    color: #666;
+}
+
+.business-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 576px) {
+    .business-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
-    
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    let html = '';
-    
-    days.forEach(day => {
-        html += `
-            <div class="day-hours">
-                <span>${day.slice(0, 3)}:</span>
-                <span>${hours[day] || 'Closed'}</span>
-            </div>
-        `;
-    });
-    
-    return html;
+}
+
+@media (min-width: 992px) {
+    .business-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .business-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.business-card {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.business-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.business-image {
+    height: 200px;
+    background-color: #f0f0f0;
+    background-size: cover;
+    background-position: center;
+}
+
+.business-info {
+    padding: 15px;
+}
+
+.business-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.business-location {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.stars {
+    color: #ffc107;
+    margin-bottom: 10px;
+}
+
+.business-address {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.view-button {
+    background-color: #ff7043;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+
+.view-button:hover {
+    background-color: #ff5722;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    position: relative;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .modal-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.modal-image {
+    height: 300px;
+    background-color: #f0f0f0;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.contact-info {
+    margin-bottom: 20px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.contact-item svg {
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.modal-hours {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.day-hours {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    margin-bottom: 5px;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: 40px;
 }
