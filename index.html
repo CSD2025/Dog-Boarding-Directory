@@ -3,55 +3,906 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Northeast Dog Boarding Directory</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>PupStay - Find Perfect Dog Boarding</title>
+    <style>
+        :root {
+            --primary: #d32323;
+            --primary-light: #f5f5f5;
+            --text: #333333;
+            --light-text: #666666;
+            --border: #e6e6e6;
+            --background: #f7f7f7;
+            --white: #ffffff;
+            --star: #f15c4f;
+            --blue: #0073bb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            color: var(--text);
+            background-color: var(--white);
+            line-height: 1.4;
+        }
+        
+        /* HEADER */
+        header {
+            background-color: var(--primary);
+            padding: 16px 0;
+        }
+        
+        .header-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .search-container {
+            flex: 1;
+            display: flex;
+            max-width: 700px;
+            margin: 0 16px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border-radius: 4px 0 0 4px;
+            padding: 12px 16px;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .location-input {
+            flex: 1;
+            border-radius: 0;
+            padding: 12px 16px;
+            border: none;
+            border-left: 1px solid var(--border);
+            font-size: 16px;
+        }
+        
+        .search-button {
+            background-color: #d32323;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            padding: 12px 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-link {
+            color: white;
+            text-decoration: none;
+            margin-left: 24px;
+            font-weight: 600;
+        }
+        
+        /* NAVIGATION */
+        .category-nav {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+        
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .nav-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-button {
+            background-color: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 16px;
+            margin-right: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .category-button:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .category-button.active {
+            background-color: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* MAIN CONTENT */
+        .main-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .filter-button {
+            background-color: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .filter-button svg {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Results */
+        .results-container {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .results-list {
+            flex: 1;
+            max-width: 650px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .results-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .sort-button {
+            background-color: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        /* Map Container */
+        .map-container {
+            flex: 1;
+            position: sticky;
+            top: 24px;
+            height: calc(100vh - 200px);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background-color: #e5e3df;
+        }
+        
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Interactive Map Elements */
+        .map-pin {
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 2;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        
+        .map-pin:hover {
+            transform: scale(1.1);
+            background-color: var(--blue);
+        }
+        
+        .map-pin-1 { top: 35%; left: 45%; }
+        .map-pin-2 { top: 55%; left: 60%; }
+        .map-pin-3 { top: 40%; left: 25%; }
+        .map-pin-4 { top: 65%; left: 40%; }
+        .map-pin-5 { top: 25%; left: 75%; }
+        .map-pin-6 { top: 75%; left: 70%; }
+        .map-pin-7 { top: 50%; left: 35%; }
+        .map-pin-8 { top: 30%; left: 55%; }
+        
+        .map-popup {
+            position: absolute;
+            background-color: white;
+            border-radius: 4px;
+            padding: 12px;
+            width: 220px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+            display: none;
+        }
+        
+        .map-popup.active {
+            display: block;
+        }
+        
+        .popup-image {
+            width: 100%;
+            height: 120px;
+            border-radius: 4px;
+            object-fit: cover;
+            margin-bottom: 8px;
+        }
+        
+        .popup-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .popup-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .stars {
+            display: flex;
+        }
+        
+        .star {
+            color: var(--star);
+            font-size: 14px;
+        }
+        
+        .popup-info {
+            font-size: 12px;
+            color: var(--light-text);
+        }
+        
+        .popup-more {
+            color: var(--blue);
+            font-size: 12px;
+            text-decoration: none;
+            display: block;
+            margin-top: 8px;
+        }
+        
+        /* Business Cards */
+        .business-card {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 24px;
+            background-color: var(--white);
+            transition: box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .business-card:hover {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .card-content {
+            display: flex;
+            padding: 24px;
+        }
+        
+        .card-image {
+            width: 210px;
+            height: 210px;
+            border-radius: 4px;
+            margin-right: 16px;
+            object-fit: cover;
+        }
+        
+        .card-info {
+            flex: 1;
+        }
+        
+        .card-number {
+            position: absolute;
+            margin-left: -45px;
+            margin-top: -5px;
+            background-color: var(--white);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--blue);
+        }
+        
+        .card-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .rating-count {
+            color: var(--light-text);
+            font-size: 14px;
+        }
+        
+        .card-categories {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .category-tag {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .category-tag::after {
+            content: "•";
+            display: inline-block;
+            margin: 0 4px;
+            color: var(--light-text);
+        }
+        
+        .category-tag:last-child::after {
+            content: "";
+        }
+        
+        .card-highlights {
+            margin-bottom: 16px;
+        }
+        
+        .highlight {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .highlight-badge {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        
+        .highlight-text {
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        .card-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .feature-tag {
+            background-color: var(--background);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .tag-green {
+            background-color: #def2de;
+            color: #0a7c07;
+        }
+        
+        .tag-blue {
+            background-color: #d1e8f6;
+            color: #086aa7;
+        }
+        
+        .tag-amber {
+            background-color: #fdf0d4;
+            color: #9d5d07;
+        }
+        
+        .tag-red {
+            background-color: #fbdddd;
+            color: #c42b2b;
+        }
+        
+        .card-location {
+            display: flex;
+            align-items: center;
+            color: var(--light-text);
+            font-size: 14px;
+        }
+        
+        .card-location svg {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .card-featured {
+            background-color: #fff8e1;
+            padding: 12px 24px;
+            border-top: 1px solid #ffe0b2;
+            font-size: 14px;
+            color: #b77c12;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-featured svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+        }
+        
+        /* PAGINATION */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 32px;
+        }
+        
+        .page-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin: 0 4px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .page-button.active {
+            background-color: var(--blue);
+            color: white;
+            border-color: var(--blue);
+        }
+        
+        .page-button:hover:not(.active) {
+            background-color: var(--background);
+        }
+        
+        /* MOBILE ADJUSTMENTS */
+        @media (max-width: 1024px) {
+            .results-container {
+                flex-direction: column;
+            }
+            
+            .results-list {
+                max-width: 100%;
+            }
+            
+            .map-container {
+                position: relative;
+                height: 300px;
+                top: 0;
+            }
+            
+            .card-image {
+                width: 150px;
+                height: 150px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .search-container {
+                display: none;
+            }
+            
+            .card-content {
+                flex-direction: column;
+            }
+            
+            .card-image {
+                width: 100%;
+                height: 200px;
+                margin-right: 0;
+                margin-bottom: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- HEADER -->
     <header>
-        <div class="container">
-            <h1>Northeast Dog Boarding Directory</h1>
-            <p>Find the perfect home away from home for your furry friend</p>
-        </div>
-    </header>
-
-    <div class="search-section">
-        <div class="container">
-            <div class="search-grid">
-                <input type="text" id="search-input" placeholder="Search by name, city, or address...">
-                <select id="state-filter">
-                    <option value="">All States</option>
-                    <!-- States will be added by JavaScript -->
-                </select>
-                <select id="rating-filter">
-                    <option value="">All Ratings</option>
-                    <option value="5">5★ & Up</option>
-                    <option value="4.5">4.5★ & Up</option>
-                    <option value="4">4★ & Up</option>
-                </select>
+        <div class="header-container">
+            <div class="logo">PupStay</div>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="dog boarding, medical care, training...">
+                <input type="text" class="location-input" placeholder="Portland, OR">
+                <button class="search-button">Search</button>
+            </div>
+            
+            <div class="user-actions">
+                <a href="#" class="user-link">List Your Facility</a>
+                <a href="#" class="user-link">Sign In</a>
             </div>
         </div>
-    </div>
-
-    <div class="container">
-        <p id="results-count" class="results-count"></p>
-        <div id="business-grid" class="business-grid">
-            <!-- Business cards will be added here by JavaScript -->
+    </header>
+    
+    <!-- NAVIGATION -->
+    <nav class="category-nav">
+        <div class="nav-container">
+            <button class="category-button active">All Places</button>
+            <button class="category-button">Aggressive Breeds</button>
+            <button class="category-button">Special Needs</button>
+            <button class="category-button">Last Minute</button>
+            <button class="category-button">Outdoor Time</button>
+            <button class="category-button">Vet on Site</button>
+            <button class="category-button">Training Available</button>
+            <button class="category-button">Grooming</button>
+            <button class="category-button">Medication</button>
         </div>
-    </div>
-
-    <div id="business-modal" class="modal">
-        <div class="modal-content">
-            <!-- Modal content will be added by JavaScript -->
+    </nav>
+    
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- FILTERS -->
+        <div class="filters">
+            <button class="filter-button">
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="currentColor" d="M10,17V14H3V10H10V7L15,12L10,17M22,12L17,7V10H10V14H17V17L22,12Z"/>
+                </svg>
+                Distance
+            </button>
+            
+            <button class="filter-button">
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="currentColor" d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+                </svg>
+                More Filters
+            </button>
+            
+            <button class="filter-button">
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="currentColor" d="M19,19H5V5H19M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M13.96,12.29L11.21,15.83L9.25,13.47L6.5,17H17.5L13.96,12.29Z"/>
+                </svg>
+                Photos
+            </button>
+            
+            <button class="filter-button">
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="currentColor" d="M12,3.25C12,3.25 6,10 6,14C6,17.32 8.69,20 12,20A6,6 0 0,0 18,14C18,10 12,3.25 12,3.25M14.47,9.97L15.53,11.03L9.53,17.03L8.47,15.97M9.75,10A1.25,1.25 0 0,1 11,11.25A1.25,1.25 0 0,1 9.75,12.5A1.25,1.25 0 0,1 8.5,11.25A1.25,1.25 0 0,1 9.75,10M14.25,14.5A1.25,1.25 0 0,1 15.5,15.75A1.25,1.25 0 0,1 14.25,17A1.25,1.25 0 0,1 13,15.75A1.25,1.25 0 0,1 14.25,14.5Z"/>
+                </svg>
+                Price: Any
+            </button>
+            
+            <button class="filter-button">
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="currentColor" d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                </svg>
+                5 miles
+            </button>
         </div>
-    </div>
-
-    <footer>
-        <div class="container">
-            <p>&copy; <span id="current-year"></span> Northeast Dog Boarding Directory. All rights reserved.</p>
-            <p>Find the perfect boarding facility for your beloved pet.</p>
+        
+        <!-- RESULTS -->
+        <div class="results-container">
+            <!-- Results List -->
+            <div class="results-list">
+                <div class="results-header">
+                    <h2 class="results-title">Best Dog Boarding in Portland, OR</h2>
+                    <button class="sort-button">Sort: Rating</button>
+                </div>
+                
+                <!-- Business Card 1 -->
+                <div class="business-card" data-id="1">
+                    <div class="card-content">
+                        <span class="card-number">1</span>
+                        <img src="/api/placeholder/400/400" alt="Happy Paws Boarding" class="card-image">
+                        
+                        <div class="card-info">
+                            <h3 class="card-title">Happy Paws Boarding</h3>
+                            
+                            <div class="card-rating">
+                                <div class="stars">
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                </div>
+                                <span class="rating-count">142 reviews</span>
+                            </div>
+                            
+                            <div class="card-categories">
+                                <a href="#" class="category-tag">Dog Boarding</a>
+                                <a href="#" class="category-tag">Pet Services</a>
+                                <a href="#" class="category-tag">Dog Training</a>
+                            </div>
+                            
+                            <div class="card-highlights">
+                                <div class="highlight">
+                                    <span class="highlight-badge">Outdoor Play</span>
+                                    <p class="highlight-text">"The dogs get 3 hours of supervised outdoor playtime daily, perfect for high-energy breeds."</p>
+                                </div>
+                                <div class="highlight">
+                                    <span class="highlight-badge">Special Needs</span>
+                                    <p class="highlight-text">"They took amazing care of my senior dog who requires medication 3 times a day."</p>
+                                </div>
+                            </div>
+                            
+                            <div class="card-features">
+                                <span class="feature-tag tag-green">Aggressive Breeds ✓</span>
+                                <span class="feature-tag tag-blue">Special Needs ✓</span>
+                                <span class="feature-tag tag-amber">Last-Minute ✓</span>
+                                <span class="feature-tag">$45/night</span>
+                            </div>
+                            
+                            <div class="card-location">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path fill="currentColor" d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                                </svg>
+                                123 Main St, Portland, OR 97205 • 2.3 miles
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-featured">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/>
+                        </svg>
+                        "Amazing facility! Staff truly cares about the dogs and the outdoor space is fantastic."
+                    </div>
+                </div>
+                
+                <!-- Business Card 2 -->
+                <div class="business-card" data-id="2">
+                    <div class="card-content">
+                        <span class="card-number">2</span>
+                        <img src="/api/placeholder/400/400" alt="Doggy Daycare Plus" class="card-image">
+                        
+                        <div class="card-info">
+                            <h3 class="card-title">Doggy Daycare Plus</h3>
+                            
+                            <div class="card-rating">
+                                <div class="stars">
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                </div>
+                                <span class="rating-count">98 reviews</span>
+                            </div>
+                            
+                            <div class="card-categories">
+                                <a href="#" class="category-tag">Dog Boarding</a>
+                                <a href="#" class="category-tag">Dog Daycare</a>
+                                <a href="#" class="category-tag">Grooming</a>
+                            </div>
+                            
+                            <div class="card-highlights">
+                                <div class="highlight">
+                                    <span class="highlight-badge">Aggressive Breeds</span>
+                                    <p class="highlight-text">"They have special protocols for dogs that need space, including separate play areas."</p>
+                                </div>
+                                <div class="highlight">
+                                    <span class="highlight-badge">Facilities</span>
+                                    <p class="highlight-text">"Clean, spacious kennels and a huge indoor play area for rainy days."</p>
+                                </div>
+                            </div>
+                            
+                            <div class="card-features">
+                                <span class="feature-tag tag-green">Aggressive Breeds ✓</span>
+                                <span class="feature-tag tag-blue">Special Needs ✓</span>
+                                <span class="feature-tag tag-red">Last-Minute ✗</span>
+                                <span class="feature-tag">$38/night</span>
+                            </div>
+                            
+                            <div class="card-location">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path fill="currentColor" d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                                </svg>
+                                456 Oak Ave, Portland, OR 97206 • 3.5 miles
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Business Card 3 -->
+                <div class="business-card" data-id="3">
+                    <div class="card-content">
+                        <span class="card-number">3</span>
+                        <img src="/api/placeholder/400/400" alt="Rover's Retreat" class="card-image">
+                        
+                        <div class="card-info">
+                            <h3 class="card-title">Rover's Retreat</h3>
+                            
+                            <div class="card-rating">
+                                <div class="stars">
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                </div>
+                                <span class="rating-count">124 reviews</span>
+                            </div>
+                            
+                            <div class="card-categories">
+                                <a href="#" class="category-tag">Dog Boarding</a>
+                                <a href="#" class="category-tag">Pet Sitting</a>
+                            </div>
+                            
+                            <div class="card-highlights">
+                                <div class="highlight">
+                                    <span class="highlight-badge">Outdoor Time</span>
+                                    <p class="highlight-text">"4 hours of outdoor play per day, with a swimming pool in summer!"</p>
+                                </div>
+                                <div class="highlight">
+                                    <span class="highlight-badge">Last-Minute</span>
+                                    <p class="highlight-text">"They accommodated my emergency boarding request at 9pm with no issues."</p>
+                                </div>
+                            </div>
+                            
+                            <div class="card-features">
+                                <span class="feature-tag tag-red">Aggressive Breeds ✗</span>
+                                <span class="feature-tag tag-blue">Special Needs ✓</span>
+                                <span class="feature-tag tag-amber">Last-Minute ✓</span>
+                                <span class="feature-tag">$55/night</span>
+                            </div>
+                            
+                            <div class="card-location">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path fill="currentColor" d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                                </svg>
+                                789 Pine St, Portland, OR 97209 • 1.8 miles
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-button active">1</button>
+                    <button class="page-button">2</button>
+                    <button class="page-button">3</button>
+                    <button class="page-button">4</button>
+                    <button class="page-button">5</button>
+                    <button class="page-button">»</button>
+                </div>
+            </div>
+            
+            <!-- Map Container -->
+            <div class="map-container">
+                <div class="map-placeholder">
+                    <!-- Interactive Map Elements -->
+                    <img src="/api/placeholder/600/600" alt="Map" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
+                    
+                    <!-- Map Pins -->
+                    <div class="map-pin map-pin-1" onclick="togglePopup(1)">1</div>
+                    <div class="map-pin map-pin-2" onclick="togglePopup(2)">2</div>
+                    <div class="map-pin map-pin-3" onclick="togglePopup(3)">3</div>
+                    <div class="map-pin map-pin-4" onclick="togglePopup(4)">4</div>
+                    <div class="map-pin map-pin-5" onclick="togglePopup(5)">5</div>
+                    <div class="map-pin map-pin-6" onclick="togglePopup(6)">6</div>
+                    <div class="map-pin map-pin-7" onclick="togglePopup(7)">7</div>
+                    <div class="map-pin map-pin-8" onclick="togglePopup(8)">8</div>
+                    
+                    <!-- Map Popups -->
+                    <div class="map-popup" id="popup-1" style="top: 15%; left: 45%;">
+                        <img src="/api/placeholder/400/400" alt="Happy Paws Boarding" class="popup-image">
+                        <h4 class="popup-title">Happy Paws Boarding</h4>
+                        <div class="popup-rating">
+                            <div class="stars">
+                                <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+                            </div>
+                            <span>142</span>
+                        </div>
+                        <p class="popup-info">Dog Boarding • $45/night</p>
+                        <a href="#" class="popup-more">View Details</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </footer>
-
-    <script src="script.js"></script>
+    </main>
+    
+    <script>
+        // Simple JavaScript to handle map popup toggling
+        function togglePopup(id) {
+            // Hide all popups first
+            document.querySelectorAll('.map-popup').forEach(popup => {
+                popup.style.display = 'none';
+            });
+            
+            // Show the selected popup
+            const popup = document.getElementById('popup-' + id);
+            if (popup) {
+                popup.style.display = 'block';
+            }
+        }
+        
+        // Make business cards highlight corresponding map pins
+        document.querySelectorAll('.business-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const id = card.getAttribute('data-id');
+                const pin = document.querySelector('.map-pin-' + id);
+                if (pin) {
+                    pin.style.backgroundColor = '#0073bb';
+                    pin.style.transform = 'scale(1.2)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                const id = card.getAttribute('data-id');
+                const pin = document.querySelector('.map-pin-' + id);
+                if (pin) {
+                    pin.style.backgroundColor = '';
+                    pin.style.transform = '';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
