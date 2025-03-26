@@ -1,6 +1,6 @@
 /* This is like a color palette for our website - think of it as choosing the main colors for a painting before we start */
 :root {
-    --primary: #d32323;          /* Yelp's signature red color */
+    --primary: #01461c;          /* Yelp's signature red color */
     --primary-light: #f5f5f5;    /* A very light gray, almost white */
     --text: #333333;             /* Dark gray for most text */
     --light-text: #666666;       /* Medium gray for less important text */
