@@ -65,7 +65,11 @@ function loadData() {
         .catch((error) => {
             console.error("Error loading data:", error);
             document.getElementById("business-grid").innerHTML =
-                "<p>Error loading data. Please try again later.</p>";
+                `<div class="error-message">
+                    <h3>Error Loading Data</h3>
+                    <p>Unable to load business listings. Please verify that dog-boarding-data.json exists and is properly formatted.</p>
+                    <p>Technical details: ${error.message}</p>
+                </div>`;
         });
 }
 
