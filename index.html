@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dog Boarding Finder - Find The Perfect Place For Your Pup To Stay</title>
-  <link rel="stylesheet" href="style.css"> 
+  <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
     <!-- HEADER -->
@@ -18,10 +18,7 @@
                 <button class="search-button">Search</button>
             </div>
             
-            <div class="user-actions">
-                <a href="#" class="user-link">List Your Facility</a>
-                <a href="#" class="user-link">Sign In</a>
-            </div>
+           
         </div>
     </header>
     
@@ -291,10 +288,32 @@
         </div>
     </main>
     
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
-<script>
+    <script>
         let map;
         let markers = [];
+        
+        // Initialize map after API loads
+        window.initMap = function() {
+            const mapContainer = document.querySelector('.map-container');
+            if (!mapContainer || !google || !google.maps) return;
+            
+            map = new google.maps.Map(mapContainer, {
+                center: { lat: 45.5155, lng: -122.6789 },
+                zoom: 12,
+                mapTypeControl: false
+            });
+        };
+
+        // Fetch API key and load Google Maps
+        fetch('/api/maps-key')
+            .then(response => response.json())
+            .then(data => {
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${data.key}&callback=initMap`;
+                document.head.appendChild(script);
+            })
+            .catch(err => console.error('Error loading map:', err));
+    </script>
         
         // Initialize map
         function initMap() {
