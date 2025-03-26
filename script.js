@@ -34,9 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Load the JSON data that would be converted from your Excel file
 function loadData() {
-    // In a real scenario, you would use fetch to get the data from a JSON file
-    // For GitHub Pages, you would need to convert your Excel to JSON first
-    fetch("dog-boarding-data.json")
+    fetch("/api/businesses")
         .then((response) => response.json())
         .then((data) => {
             businesses = data;
