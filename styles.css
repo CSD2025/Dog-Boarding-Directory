@@ -189,6 +189,96 @@ header {
     background-color: #e5e3df;   /* Map-like background color */
 }
 
+        /* Interactive Map Elements */
+        .map-pin {
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 2;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        
+        .map-pin:hover {
+            transform: scale(1.1);
+            background-color: var(--blue);
+        }
+        
+        .map-pin-1 { top: 35%; left: 45%; }
+        .map-pin-2 { top: 55%; left: 60%; }
+        .map-pin-3 { top: 40%; left: 25%; }
+        .map-pin-4 { top: 65%; left: 40%; }
+        .map-pin-5 { top: 25%; left: 75%; }
+        .map-pin-6 { top: 75%; left: 70%; }
+        .map-pin-7 { top: 50%; left: 35%; }
+        .map-pin-8 { top: 30%; left: 55%; }
+        
+        .map-popup {
+            position: absolute;
+            background-color: white;
+            border-radius: 4px;
+            padding: 12px;
+            width: 220px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+            display: none;
+        }
+        
+        .map-popup.active {
+            display: block;
+        }
+        
+        .popup-image {
+            width: 100%;
+            height: 120px;
+            border-radius: 4px;
+            object-fit: cover;
+            margin-bottom: 8px;
+        }
+        
+        .popup-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .popup-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .stars {
+            display: flex;
+        }
+        
+        .star {
+            color: var(--star);
+            font-size: 14px;
+        }
+        
+        .popup-info {
+            font-size: 12px;
+            color: var(--light-text);
+        }
+        
+        .popup-more {
+            color: var(--blue);
+            font-size: 12px;
+            text-decoration: none;
+            display: block;
+            margin-top: 8px;
+        }
+        
+
 /* Business cards styling */
 .business-card {
     border: 1px solid var(--border);  /* Light gray border */
