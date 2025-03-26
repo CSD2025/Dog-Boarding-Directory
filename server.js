@@ -13,6 +13,10 @@ const pool = mysql.createPool({
 
 app.use(express.static('.'));
 
+app.get('/api/maps-key', (req, res) => {
+  res.json({ key: process.env.GOOGLE_MAPS_API_KEY || '' });
+});
+
 app.get('/api/businesses', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM businesses');

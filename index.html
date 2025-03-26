@@ -288,7 +288,17 @@
         </div>
     </main>
     
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <script>
+        // Fetch the API key and load Google Maps
+        fetch('/api/maps-key')
+            .then(response => response.json())
+            .then(data => {
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${data.key}&loading=async`;
+                document.head.appendChild(script);
+                script.onload = initMap;
+            });
+    </script>
 <script>
         let map;
         let markers = [];
